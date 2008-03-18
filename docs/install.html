@@ -1,0 +1,166 @@
+<html>
+<!--
+This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+<body>
+
+
+<h2>Installing the Simple-Karma Plugin</h2>
+
+<p>
+To install the simple-karma plugin into WordPress drag the entire simple-karma folder into 
+wordpress/wp-content/plugins. Then go to the WordPress admin page. Click plugins, then click 
+"activate" next to the simple-karma plugin.
+</p>
+<p>
+Simple-karma will add a table called "wp_simple_karma" in which karma rating values will be stored for various content on a site. If you specified a diferent prefix other than the default "wp_" than the table will use the prefix you designated. In WordPress MU, a simple-karma table for each blog will be installed for every blog that activates simple-karma. In this case the simple-karma table will use the MU prefixing for sub blogs, e.g. "wp_1_simple_karma", wp_2_simple_karma", etc.
+</p>
+<p>
+</p>
+
+<h4>Errata & Caveats</h4>
+
+   Be aware (or beware) of these issues when using simple-karma:
+
+<ol>
+  <li>If you delete site content through the normal WordPress administration page for that content and the content has a simple-karma rating record, the simple-karma rating record will become orphened.</li>
+  <li>If you're going to use the integration plugin for bbPress, pay close attention to the section that describes how to do this (below). When using the supplied bbPress integration plugin with WordPress MU there is a little smoke and mirrors to be aware of. bbPress karma ratings will be stored in the master blogs simple-karma table, e.g. "wp_1_simple_karma". To manage karma ratings for bbPress you will need to use the simple-karma administration page for the master blog in MU. The reason for this is that:
+    <ol>
+      <li>When writing simple-karma we needed to consolidate administration</li>
+      <li>While WordPress MU can have many different blog content silos, they all share a single bbPress instance. There is a certain logic to having it's posts managed by the master blog. A future enhancement might include an option to deligate this to one of the sub blogs.
+    </ol>
+  </li>
+</ol>
+
+<h2>Modifying Your Templates to Use Simple-karma</h2>
+<p>
+   Simple-karma provides two AJAXified widgets for rating site content: a Rating widget that allows for +/- karma ratings; and an abuse widget that allows for only negative ratings. These widgets as interchangeable and either may be used in any context. To use the rating widget call getKarmaWidget(). To use the abuse only widget call getAbuseWidget(). The syntax for each call will be the same and are described below.
+</p>
+<p>
+Simple-karma can work with any site-content you would like to rate. There are special handlers for common WordPress content types that add additional functionality to the management page. These items are: comments, posts, bbPress posts and simple-comments (another plugin we developed). For other content the administration page will still work but be a bit more vanilla.
+</p>
+<p>
+In order for simple-karma to work, 
+you must put a slice of code in your WordPress template (wordpress/wp-content/themes/default is your default template). Follow the directions below for the type of content you are adding ratings to.
+</p>
+<h4>WordPress Comments</h4>
+<p>
+To use simple-karma with WordPress comments you will need to open wordpress/wp-content/themes/default/comments.php 
+(replace "default" with the template you are using). Within the comment display loop place this code:
+</p>
+
+<table class="ex" border="1" style='background-color:#ADD8E6;' cellspacing="0" width="100%"><tbody><tr><td>
+<pre>
+$current_plugins = get_option('active_plugins');
+if (in_array('simple-karma/SimpleKarma.php', $current_plugins))
+{
+	require_once(ABSPATH."/wp-content/plugins/simple-karma/classes/classes.php");
+	$simpleKarma = new SimpleKarma('comments');
+	echo $simpleKarma->getKarmaWidget($comment->comment_ID);
+}
+</pre>
+</td></tr></tbody></table>
+<p>
+Note that the "comments" table does not include the prefix. Simple-karma will determine the correct prefix from your configuration. If you include the prefix simple-karma will not work.
+</p>
+<p>
+Where you place the code (within the loop) will determine where your simple-karma widget shows up. So if you want it at the top of your comment, place it in the beginning of the loop. If you would prefer it at the bottom, place it at the end of the loop.
+</p>
+<p>
+You may also want to place an anchor in the comment loop (preferably at the very beginning of the loop). This will allow the context links in the admin page to snap to the content item on the live site. You only need to do this with WordPress comments because WordPress posts already have an anchor (in the default loop).
+</p>
+
+<table class="ex" border="1" style='background-color:#ADD8E6;' cellspacing="0" width="100%"><tbody><tr><td>
+&lt;a name='" . $comment->comment_ID . "'&gt;
+&lt;/a&gt;
+</td></tr></tbody></table>
+<h4>WordPress Posts</h4>
+<p>
+To use simple-karma with WordPress posts you would open wordpress/wp-content/themes/default/index.php (replace "default" with the template you are using). Within the post display loop place this code:
+</p>
+<table class="ex" border="1" style='background-color:#ADD8E6;' cellspacing="0" width="100%"><tbody><tr><td>
+<pre>
+$current_plugins = get_option('active_plugins');
+if (in_array('simple-karma/SimpleKarma.php', $current_plugins))
+{
+	require_once(ABSPATH."/wp-content/plugins/simple-karma/classes/classes.php");
+	$simpleKarma = new SimpleKarma('posts');
+	echo ($simpleKarma->getKarmaWidget(get_the_ID()));
+}
+
+</pre>
+</td></tr></tbody></table>
+<p>
+Note that the "posts" table does not include the prefix. Simple-karma will determine the correct prefix from your configuration. If you include the prefix simple-karma will not work.
+</p>
+<h4>bbPress Posts</h4>
+<p>
+To use simple-karma with bbPress posts you need to install bbPress into the same database as your WordPress install. Be sure to configure bbPress with the proper WordPress table prefix (usually "wp_"). You than need to drop the "bbpress/simple-karma-bbpress.php" and "bbpress/simple-karma-bbpress.js" files into the "my-plugins" directory of bbPress. You will be able to manage rated comments in bbPress with the WordPress admin UI for SimpleKarma.  There is no bbPress specific admin UI.
+</p>
+<p>
+If you are using WordPress MU than bbPress rating data will be stored in the SimpleKarma table for the master MU blog. Only administrators for the main blog (e.g. "wp_1_") will be able to manage rating data for bbPress posts.
+</p>
+<p>
+To add the SimpleKarma widget to bbPress posts, insert the following code within the post.php file somewhere within the rendering loop:
+</p>
+<table class="ex" border="1" style='background-color:#ADD8E6;' cellspacing="0" width="100%"><tbody><tr><td>
+<pre>
+require_once("my-plugins/simple-karma-bbpress.php");
+$simpleKarma = new SimpleKarma('bb_posts');
+echo ($simpleKarma->getKarmaWidget(get_post_id()));
+</pre>
+</td></tr></tbody></table>
+<p>
+Note that in the case of bbPress you do include the prefix to the posts table. This is because of the afformentioned smoke and mirrors with regards to the bbPress integration. It is difficult to share configuration details between WordPress and bbPress and so the bbPress side of the integration is largely hard coded to a few basic assumptions.
+</p>
+<h4>Other Site Content</h4>
+<p>
+To use simple-karma for other site content, first you need to determine the database name where the content you want to use is stored. The table needs to use the table prefix in your WordPress configuration file. If the table does not use the configured wordPress prefix, simple-karma can not be used to rate it. This is because simple-karma needs to determine prefix + table combinations in order to work properly with MU.
+</p>
+<p>
+Once you have the name of the database use it as the argument (sans prefix) to create the new simple-karma class in the template file that is used to render the table's contents (replace the first bold line below). The second thing you need is to get the id of the content. Most content already has a "getID" function, so if you know that you can place it in the getKarmaWidget function argument (replace the second bold line below). If not you can write your own function to get the ID from the database. It is necessary for each widget to have it's own unique ID.
+</p>
+<table class="ex" style='background-color:#ADD8E6;' border="1" cellspacing="0" width="100%"><tbody><tr><td>
+<pre>
+$current_plugins = get_option('active_plugins');
+if (in_array('simple-karma/SimpleKarma.php', $current_plugins))
+{
+	require_once(ABSPATH."/wp-content/plugins/simple-karma/classes/classes.php");
+	$simpleKarma = new SimpleKarma('<b>Your database table here</b>');
+	echo ($simpleKarma->getKarmaWidget(<b>Your 'getID' function here</b>));
+}
+</pre>
+</td></tr></tbody></table>
+<p>
+As of right now links on the management page will not work with other site content.
+</p>
+
+<h2>Additional Useful API Methods</h2>
+
+The SimpleKarma class has some helper API methods you may find useful when tamplating your site. Brief descriptions follow.
+
+<dl>
+  <dt>isFlagged($id)</dt>
+  <dd>Returns true if the item specified by $id is below the current threshold. Other wise returns false.
+  </dd>
+  <dt>getCssClass($id, $flagged, $notFlagged)</dt>
+  <dd>Will return the supplied string "$flagged" if the item specified by $id is below the current threshold. Other wise it will return the $notFlagged string. If $flagged and $notFlagged are CSS class names this method should make it trivial to special case flagged content.
+  </dd>
+  <dt>isAtThreshold($id)</dt>
+  <dd>Returns true if the item specified by $id has a rating exactly equal to the current threshold.  Other wise returns false.
+  </dd>
+</dl>
+</body>
+</html>
