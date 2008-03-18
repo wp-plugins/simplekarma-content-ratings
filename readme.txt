@@ -10,9 +10,9 @@ Stable tag: 1.0.0
 
 == Description ==
 
-The simple-karma plugin allows users to rate content by altering the rating either up or down. This
-plugin can be used with comments, posts or any other content.
+The simple-karma plugin allows users to rate content by altering the rating either up or down. This plugin can be used with comments, posts or any other content.
 
+Note: In the WordPress svn repository the plugin is incorrectly named simplekarma-content-ratings.  Be sure to rename the extracted folder to "simple-karma" before installing it in the WordPress plugins directory.
 
 == Frequently Asked Questions ==
 
