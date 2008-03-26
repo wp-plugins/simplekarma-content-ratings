@@ -20,12 +20,13 @@ require_once('simpletest/mock_objects.php');
 require_once("../../../../wp-config.php");
 require_once('../classes/classes.php');
 
-Mock::generate('wpdb', 'Mockwpdb');
+Mock::generate('wpdb','Mockwpdb');
 
 class Karma
 {
     function Karma($masterId, $prefix, $karma)
 	{
+		global $wpdb;
 	    $this->id = $id;
 	    $this->prefix = $prefix;
 	    $this->karma = $karma;
@@ -168,8 +169,8 @@ class TestOfSimpleKarma extends UnitTestCase
 	    $mockWpdb = &new Mockwpdb();
 		$mockWpdb->setReturnValue('get_results', $mock_location);
 	    $obj = new SimpleKarma('bar',$mockWpdb);
-	    $results = $obj->isAboveThreshold(1, 'Flagged', 'Not Flagged');
-		$this->assertEqual($results, 'Not Flagged');
+	    $results = $obj->isAtThreshold(1);
+		$this->assertEqual($results, false);
 	}
 	
 	function test_hasPassedThreshold()
@@ -178,7 +179,7 @@ class TestOfSimpleKarma extends UnitTestCase
 	    $mockWpdb = &new Mockwpdb();
 		$mockWpdb->setReturnValue('get_results', $mock_location);
 	    $obj = new SimpleKarma('bar',$mockWpdb);
-	    $results = $obj->hasPassedThreshold(1);
+	    $results = $obj->isFlagged(1);
 		$this->assertEqual($results, false);
 	}
 	
@@ -214,6 +215,19 @@ class TestOfSimpleKarma extends UnitTestCase
 		$this->assertEqual($results[0]->karma, 1);
 	}
 	
+	function testForMultipleRecords()
+	{
+		$obj = new SimpleKarma('test');
+		$obj->modifyKarma(99999999, 1);
+		$obj->modifyKarma(99999999, -1);
+		$obj->modifyKarma(99999999, -1);
+		$query = "select karma from wp_simple_karma where foreign_table='test' and object_id=99999999"; 
+		$results = $obj->db->get_results($query);
+		$query = "delete from wp_simple_karma where foreign_table='test' and object_id=99999999";
+		$obj->db->query($query);
+		$this->assertEqual($results[0]->karma, -1);
+		
+	}
 
 		
 }

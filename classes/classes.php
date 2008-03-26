@@ -71,11 +71,24 @@ if(!class_exists("SimpleKarma"))
 			$query = "UPDATE $this->skt SET karma = $karma where foreign_table='$this->table' and object_id='$id';";
 			$result = $this->db->query($query); 
 		}
+		
+		function recordExists($id)
+		{
+			$query = "select * from $this->skt where foreign_table='$this->table' and object_id='$id';"; 
+			$result = $this->db->get_results($query);
+			$row = $result[0];
+			if ($row == null)
+			{
+				return false;
+			}
+			return true;
+			
+		}
 				
 		function modifyKarma($id, $value)
 		{
 			$karma = $this->getKarma($id);					
-			if($karma == 0)
+			if($this->recordExists($id) == false)
 			{
 				$this->db->query("INSERT INTO $this->skt (object_id, foreign_table, karma) VALUES ('$id', '".$this->table."', '$value');");
 				$karma = $value;
