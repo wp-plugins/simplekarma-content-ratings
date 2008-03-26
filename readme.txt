@@ -6,6 +6,8 @@ Requires at least: 2.3.2
 Tested up to: 2.3.2
 Stable tag: trunk
 
+The simple-karma plugin allows for ratings to be associated with any type of site content.
+
 == Description ==
 
 The simple-karma plugin allows users to rate content by altering the rating either up or down. This plugin can be used with comments, posts or any other content.
