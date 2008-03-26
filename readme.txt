@@ -6,7 +6,7 @@ Donate link: http://csmonitor.com/
 Tags: comments, posts, rating
 Requires at least: 2.3.2
 Tested up to: 2.3.2
-Stable tag: 1.0.1
+Stable tag: trunk
 
 == Description ==
 
