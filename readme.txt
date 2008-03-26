@@ -1,5 +1,5 @@
 === Simple-Karma ===
-Contributors:Ashley Mitchell <mitchella1@wit.edu>, Jeremy Stark <starkj@csps.com>, Matt Magliocca <maglioccam@csps.com>
+Contributors: Ashley Mitchell, Jeremy Stark, Matt Magliocca
 Donate link: http://csmonitor.com/
 Tags: comments, posts, rating
 Requires at least: 2.3.2
