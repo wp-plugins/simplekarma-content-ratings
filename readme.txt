@@ -1,7 +1,5 @@
 === Simple-Karma ===
-Contributors:Ashley Mitchell <mitchella1@wit.edu>, Lead Developer
-             Jeremy Stark <starkj@csps.com>, Architect, WordPress MU integration
-             Matt Magliocca <maglioccam@csps.com>, bbPress plugin
+Contributors:Ashley Mitchell <mitchella1@wit.edu>, Jeremy Stark <starkj@csps.com>, Matt Magliocca <maglioccam@csps.com>
 Donate link: http://csmonitor.com/
 Tags: comments, posts, rating
 Requires at least: 2.3.2
