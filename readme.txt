@@ -8,7 +8,7 @@ Stable tag: 1.2.0
 
 == Description ==
 
-The simple-karma plugin allows users to rate content by altering the rating either up or down. This plugin can be used with comments, posts or any other content.
+The simple-karma plugin allows users to rate content by altering the rating either up or down. This plugin can be used with comments, posts or any other content. It uses cookies to track users who have already voted. If the user does not have cookies turned on or deletes the cookie, they will be able to cast several votes. Basically, for our use case we don't care to much about people voting several times. There are more nefarious ways to abuse a rating widget than this blatently obvious (and correctable) tactic. See the thread attached to this product for more comments on this.
 
 Note: In the WordPress svn repository the plugin is incorrectly named simplekarma-content-ratings.  Be sure to rename the extracted folder to "simple-karma" before installing it in the WordPress plugins directory.
 
