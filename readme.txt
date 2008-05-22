@@ -1,10 +1,12 @@
 === Simple-Karma ===
-Contributors:Ashley Mitchell <mitchella1@wit.edu>, Jeremy Stark <starkj@csps.com>, Matt Magliocca <maglioccam@csps.com>
+Contributors:Ashley Mitchell <mitchella1@wit.edu>, Lead Developer
+             Jeremy Stark <starkj@csps.com>, Architect, WordPress MU integration
+             Matt Magliocca <maglioccam@csps.com>, bbPress plugin
 Donate link: http://csmonitor.com/
 Tags: comments, posts, rating
 Requires at least: 2.3.2
 Tested up to: 2.3.2
-Stable tag: trunk
+Stable tag: 1.0.0
 
 == Description ==
 
