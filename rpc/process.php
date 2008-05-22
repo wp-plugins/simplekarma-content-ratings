@@ -28,11 +28,11 @@ if ($action == 'subtract')
 $karma = $simpleKarma->modifyKarma($id , $value);
 if($simpleKarma->isFlagged($id))
 {
-	$message = get_option('threshold_message');
+	$message = $simpleKarma->getMessageOption();
 }
 else
 {
-	$message = '';
+	$message = ' Post Flagged';
 }
 $imgpathup = get_bloginfo('wpurl') . '/wp-content/plugins/simple-karma/images/gray_up.gif';
 $imgpathdown = get_bloginfo('wpurl') . '/wp-content/plugins/simple-karma/images/gray_down.gif';

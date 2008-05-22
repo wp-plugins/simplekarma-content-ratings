@@ -20,17 +20,52 @@ This program is free software; you can redistribute it and/or modify
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */ 
-
-require_once( ABSPATH . "/wp-config.php" );
-require_once( ABSPATH . "wp-content/plugins/simple-karma/admin/page.php" );
-require_once( ABSPATH . "wp-content/plugins/simple-karma/admin/options-page.php" );
-function createTable ()
+if (is_admin() == true)
+{
+	require_once( ABSPATH . "/wp-config.php" );
+	require_once( ABSPATH . "wp-content/plugins/simple-karma/admin/page.php" );
+	require_once( ABSPATH . "wp-content/plugins/simple-karma/admin/options-page.php" );
+}
+function createSimpleKarmaTables()
 { 
 	global $wpdb;
 	global $table_name;
+	global $options_table;
 	$table_name = $wpdb-> prefix . "simple_karma" ;
+	$options_table = $wpdb-> prefix . "simple_karma_options";
    
    //if table doesn't already exsist
+   	if ($wpdb-> get_var( "SHOW TABLES LIKE '$options_table'" ) != $options_table)
+	{
+		//creates wp_simple_karma_option table
+		$create_options_table = "CREATE TABLE " . $options_table .  " (
+				id int(10) unsigned NOT NULL auto_increment,
+		        option_name varchar(100),
+				option_value longtext,
+				UNIQUE KEY id  (id)
+				);";
+		
+		require_once(ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta($create_options_table);
+		
+		$insert = "INSERT INTO " . $options_table .
+				" (option_name, option_value) " .
+				"VALUES ('threshold',-5)";
+				
+		$wpdb->query( $insert );
+		$insert = "INSERT INTO " . $options_table .
+            " (option_name, option_value) " .
+            "VALUES ('threshold_message','You have exceeded the threshold.')";
+			
+		$wpdb->query( $insert );
+		$insert = "INSERT INTO " . $options_table .
+            " (option_name, option_value) " .
+            "VALUES ('bbpress_table','bb_post')";
+			
+		$wpdb->query( $insert );
+
+	}
+	
 	if ($wpdb-> get_var( "SHOW TABLES LIKE '$table_name'" ) != $table_name)
 	{
 		//creates wp_simple_karma table
@@ -44,6 +79,7 @@ function createTable ()
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta( $sql );
 	}
+
 }
 
 function simplekarma_add_js ()
@@ -53,7 +89,6 @@ function simplekarma_add_js ()
 
     echo "\n\t<!-- Added By SimpleKarma Plugin. Version {$version} -->";
     echo "\n\t<script type='text/javascript' src='{$wp_url}wp-content/plugins/simple-karma/javascript/functions.js'></script>";
-    echo "\n\t<link rel='stylesheet' href='{$wp_url}wp-content/plugins/SimpleKarma/public.css' type='text/css' media='screen'/>";
     echo "\n\t<!-- End SimpleKarma additions -->\n";
 }
 
@@ -63,7 +98,7 @@ function add_comment_anchor()
 }
 
 // Calls createTable function on activation of the plugin
-register_activation_hook( __FILE__, 'createTable' );
+register_activation_hook( __FILE__, 'createSimpleKarmaTables' );
 add_action( 'admin_menu', 'SimpleKarma_options' );
 add_action( 'wp_head', 'simplekarma_add_js' );
 add_action( 'admin_head', 'simplekarma_add_js' );

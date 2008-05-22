@@ -1,4 +1,5 @@
 <?php
+$simpleKarma = new SimpleKarma('');
 function bbpress_options()
 {
 	if (function_exists('add_options_page'))
@@ -10,6 +11,7 @@ function bbpress_options()
 
 function bbpress_optionspage()
 {
+	global $simpleKarma;
 	?>
 	<div class="wrap">
 	<h2><?php _e('Simple Karma for bbpress'); ?></h2>
@@ -20,7 +22,7 @@ function bbpress_optionspage()
 		</p>
 		<p><?php _e('Configuration options for Simple Karma integrated into bbPress'); ?></p>
 		<h3>Table Name:</h3>
-			<input type="text" name="bbpress_table" size="15" value="<?php echo get_option('bbpress_table'); ?>" />
+			<input type="text" name="bbpress_table" size="15" value="<?php echo $simpleKarma->getTableOption(); ?>" />
 			<p>Please write the name of the table, not including the prefix (i.e. posts) for the posts table.
 			<br/>
 		</p>

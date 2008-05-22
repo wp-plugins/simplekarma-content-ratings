@@ -99,7 +99,6 @@ class TestOfSimpleKarma extends UnitTestCase
 		//Karma
 		$this->assertPattern("/\<small id=\"karma-1\"\>1\<\/small\>/", $result, "Karma is missing or incorrect");
 		$this->assertPattern("<!-- End SimpleKarma Widget -->", $result , "End karma comment is missing or incorrect");
-		echo $result;
 	}
 	
 	function test_getAdminKarmaWidget()
@@ -128,7 +127,6 @@ class TestOfSimpleKarma extends UnitTestCase
 		//Karma
 		$this->assertPattern("/\<small id=\"karma-1\"\>1\<\/small\>/", $result, "Karma is missing or incorrect");
 		$this->assertPattern("<!-- End SimpleKarma Admin Widget -->", $result , "End karma comment is missing or incorrect");
-		echo $result;
 	}
 	
 	function test_getAbuseWidget()
@@ -143,14 +141,13 @@ class TestOfSimpleKarma extends UnitTestCase
 		//Down Button
 		$this->assertPattern("/<img id=\"down-1\"/", $result, "The image id is missing or incorrect");
 		$this->assertPattern("/images\/inappropriate-active-icon.gif/", $result, "The image path is missing or incorrect");
-		$this->assertPattern("/alt=\"Subtract karma\"/", $result, "The alt tag is missing or incorrect");
+		$this->assertPattern("/title=\'Flag this post as inappropriate\'/", $result, "The alt tag is missing or incorrect");
 		$this->assertPattern("/javascript\:modifyKarma/", $result, "The incorrect javascript is being called");
 		$this->assertPattern("/'1',1, 'subtract'/", $result, "Incorrect parameters are being sent to the javascript function");
 		$this->assertPattern("/'bar'/", $result, "Incorrect prefix is being sent to the javascript function");
 		//Karma
 		$this->assertPattern("/\<small id=\"karma-1\"\>1\<\/small\>/", $result, "Karma is missing or incorrect");
 		$this->assertPattern("<!-- End SimpleKarma Abuse Widget -->", $result , "End karma comment is missing or incorrect");
-		echo $result;
 	}
 	
 	function test_getForeignTables()

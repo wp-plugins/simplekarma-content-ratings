@@ -18,22 +18,33 @@ if(!class_exists("SimpleKarma"))
 {
 	class SimpleKarma
 	{
-		function SimpleKarma($parent_table, $db = "")
+		protected $db;
+		
+		function SimpleKarma($parent_table = "", $db = "")
 		{
 			global $wpdb;
             // Set this equal to your bbPress posts table name
-            $this->bbpress_posts = get_option('bbpress_table');
-            $this->threshold = $this->getThreshold();
-
-			$this->table = $parent_table;
-			
-		    if($db != "")
+            if($db != "")
 			{
 			    $this->db = $db;
 			}
 			else
 			{
 			    $this->db = $wpdb;
+			}
+			
+			
+			
+			$this->threshold = $this->getThreshold();
+			$this->bbpress_posts = $this->getTableOption();
+			
+			if($parent_table != "")
+			{
+			    $this->table = $parent_table;
+			}
+			else
+			{
+			    $this->table = 'comments';
 			}
 			
 			if($parent_table == $this->bbpress_posts)
@@ -46,6 +57,7 @@ if(!class_exists("SimpleKarma"))
 			}
 
 			$this->skt = $this->db->prefix . 'simple_karma';
+			$this->skot = $this->db->prefix . 'simple_karma_options';
 		}
 		
 		function getParentTable()
@@ -121,19 +133,19 @@ if(!class_exists("SimpleKarma"))
 				{
 					if($result == $id)
 					{
-						$widget .= ("<img id=\"up-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/gray_up.gif\" alt=\"Add karma\">&nbsp");
-						$widget .= ("<img id=\"down-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/gray_down.gif\" alt=\"Subtract karma\"> "); 			
+						$widget .= ("<img id=\"up-$id\" style=\"cursor: pointer;\" width=16 height=14 src=\"{$plugin_path}images/gray_up.gif\" alt=\"Add karma\">&nbsp");
+						$widget .= ("<img id=\"down-$id\" style=\"cursor: pointer;\" width=16 height=14 src=\"{$plugin_path}images/gray_down.gif\" alt=\"Subtract karma\"> "); 			
 						$count ++;
 					}
 				}
 			}
 			if($count == 0)
 			{
-				$widget .= ("<img id=\"up-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/up.gif\" alt=\"Add karma\" onclick=\"javascript:modifyKarma('$id',1, 'add', '{$ck_link}/wp-content/plugins/simple-karma/', '".$this->table."');\" />&nbsp;");
-				$widget .= ("<img id=\"down-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/down.gif\" alt=\"Subtract karma\" onclick=\"javascript:modifyKarma('$id',1, 'subtract', '{$ck_link}/wp-content/plugins/simple-karma/', '".$this->table."')\" />"); 			
+				$widget .= ("<img id=\"up-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/up.gif\" width=16 height=14 alt=\"Add karma\" onclick=\"javascript:modifyKarma('$id',1, 'add', '{$ck_link}/wp-content/plugins/simple-karma/', '".$this->table."');\" />&nbsp;");
+				$widget .= ("<img id=\"down-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/down.gif\" width=16 height=14 alt=\"Subtract karma\" onclick=\"javascript:modifyKarma('$id',1, 'subtract', '{$ck_link}/wp-content/plugins/simple-karma/', '".$this->table."')\" />"); 			
 			}
 			$widget .= "&nbsp;&nbsp;<small id=\"karma-{$id}\">{$karma}</small>";
-			$widget .= "<div class='simple-karma-message' id='simple-karma-message-$id'></div>";
+			$widget .= "<div class='no-simple-karma-message' id='no-simple-karma-message-$id'></div>";
 			$widget .= "</div>";
 			$widget .= "<!-- End SimpleKarma Widget -->";
 			//Simple Karma Widget End
@@ -148,8 +160,8 @@ if(!class_exists("SimpleKarma"))
 			//Simple Karma Admin Widget Begins
 			$widget .= "<!-- SimpleKarma Admin Widget Version 0.1 -->";
 			$widget .= "<div class='simplekarma-widget'>";
-			$widget .= ("<img id=\"up-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/up.gif\" alt=\"Add karma\" onclick=\"javascript:modifyKarma('$id',1, 'add', '{$ck_link}/wp-content/plugins/simple-karma/', '".$this->table."', modifyKarmaCallBackAdmin);\" />&nbsp;");
-			$widget .= ("<img id=\"down-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/down.gif\" alt=\"Subtract karma\" onclick=\"javascript:modifyKarma('$id',1, 'subtract', '{$ck_link}/wp-content/plugins/simple-karma/', '".$this->table."', modifyKarmaCallBackAdmin)\" />"); 			
+			$widget .= ("<img id=\"up-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/up.gif\"  width=16 height=14 alt=\"Add karma\" onclick=\"javascript:modifyKarma('$id',1, 'add', '{$ck_link}/wp-content/plugins/simple-karma/', '".$this->table."', modifyKarmaCallBackAdmin);\" />&nbsp;");
+			$widget .= ("<img id=\"down-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/down.gif\" width=16 height=14 alt=\"Subtract karma\" onclick=\"javascript:modifyKarma('$id',1, 'subtract', '{$ck_link}/wp-content/plugins/simple-karma/', '".$this->table."', modifyKarmaCallBackAdmin)\" />"); 			
 			$widget .= "&nbsp;&nbsp;<small id=\"karma-{$id}\">{$karma}</small>";
 			$widget .= "</div>";
 			$widget .= "<!-- End SimpleKarma Admin Widget -->";
@@ -172,20 +184,51 @@ if(!class_exists("SimpleKarma"))
 				{
 					if($result == $id)
 					{
-						$widget .= ("<img id=\"up-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/inappropriate-off-icon.gif\" alt=\"Add karma\">&nbsp");
+						$widget .= ("<img id=\"up-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/inappropriate-off-icon.gif\" width=16 height=14 alt=\"Add karma\">&nbsp");
 						$count ++;
 					}
 				}
 			}
 			if($count==0)
 			{
-				$widget .=("<img id=\"down-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/inappropriate-active-icon.gif\" alt=\"Subtract karma\" onclick=\"javascript:modifyKarma('$id',1, 'subtract', '{$ck_link}/wp-content/plugins/simple-karma/', '".$this->table."', modifyAbuseCallBack)\" />"); 			
+				$widget .=("<img id=\"down-$id\" style=\"cursor: pointer;\" src=\"{$plugin_path}images/inappropriate-active-icon.gif\" width=16 height=14 title='Flag this post as inappropriate' onclick=\"javascript:modifyKarma('$id',1, 'subtract', '{$ck_link}/wp-content/plugins/simple-karma/', '".$this->table."', modifyAbuseCallBack)\" />"); 			
 			}
 			$widget .= "&nbsp;&nbsp;<small id=\"karma-{$id}\">{$karma}</small>";
-			$widget .= "<div class='simple-karma-message' id='simple-karma-message-$id'></div>";
+			$widget .= "<div class='simple-karma-message' id='simple-karma-message-$id'> Flag this post as inappropriate </div>";
 			$widget .= "</div>";
 			$widget .= "<!-- End SimpleKarma Abuse Widget -->";
 			return $widget;
+		}
+		
+		function updateOptions($threshold, $message, $table)
+		{
+			$insert = "update $this->skot set option_value=$threshold where option_name='threshold'";
+			$this->db->query($insert);
+			$insert = "update $this->skot set option_value='$message' where option_name='threshold_message'";
+			$this->db->query($insert);
+			$insert = "update $this->skot set option_value='$table' where option_name='bbpress_table'";
+			$this->db->query($insert);			
+		}
+		
+		function getThresholdOption()
+		{
+			$query = "select option_value from $this->skot where option_name='threshold'";
+			$result = $this->db->get_var($query);
+			return $result;
+		}
+		
+		function getMessageOption()
+		{
+			$query = "select option_value from $this->skot where option_name='threshold_message'";
+			$result = $this->db->get_var($query);
+			return $result;	
+		}
+		
+		function getTableOption()
+		{
+			$query = "select option_value from $this->skot where option_name='bbpress_table'";
+			$result = $this->db->get_var($query);
+			return $result;		
 		}
 		
 		function getForeignTables()
@@ -296,7 +339,8 @@ if(!class_exists("SimpleKarma"))
 
         function getThreshold()
         {
-            $threshold = get_option('threshold');
+            $threshold = $this->getThresholdOption();
+			
 			if($threshold > 0)
 			{
 				$threshold = 0 - $threshold;
@@ -317,6 +361,7 @@ if(!class_exists("SimpleKarma"))
 		{
             return $this->threshold == $this->getKarma($id);
 		}
+		
 	}
 }
 ?>
